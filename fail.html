@@ -1,5 +1,24 @@
+<style>
+	@import url('https://fonts.googleapis.com/css2?family=Urbanist&display=swap');
+	body {
+		text-align: center;
+	}
+
+	div {
+		list-style-type: none;
+	}
+
+	* {
+		font-family: 'Urbanist', sans-serif;
+	}
+
+	input,
+	button {
+		position: sticky;
+		bottom: 0px;
+	}
+</style>
 <h1>The selected room was already created. Redirecting back to create-room page in 2 seconds.</h1>
-<script>
- await new Promise(resolve  => setTimeout(resolve, 2000));
- window.location.href = "/new";
-</script>
+<button onclick = "window.location.href = '/new';">
+  BACK!
+</button>

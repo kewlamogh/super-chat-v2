@@ -7,9 +7,43 @@ let targetUsername;
 let online = {};
 let currentUser = "Anonymous";
 let rooms = [];
-let ejs = require("ejs");
 const Database = require("@replit/database");
 const db = new Database()
+/*
+const crypto = require("crypto")
+
+const encrypt = (plainText) => {
+  try {
+    const iv = crypto.randomBytes(16);
+    const key = crypto.createHash('sha256').update(process.env.password).digest('base64').substr(0, 32);
+    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+
+    let encrypted = cipher.update(plainText);
+    encrypted = Buffer.concat([encrypted, cipher.final()])
+    return iv.toString('hex') + ':' + encrypted.toString('hex');
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const decrypt = (encryptedText) => {
+  try {
+    const textParts = encryptedText.split(':');
+    const iv = Buffer.from(textParts.shift(), 'hex');
+
+    const encryptedData = Buffer.from(textParts.join(':'), 'hex');
+    const key = crypto.createHash('sha256').update(process.env.password).digest('base64').substr(0, 32);
+    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+    
+    const decrypted = decipher.update(encryptedData);
+    const decryptedText = Buffer.concat([decrypted, decipher.final()]);
+    return decryptedText.toString();
+  } catch (error) {
+    console.log(error)
+  }
+}
+*/
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/login.html");
@@ -23,7 +57,7 @@ app.get("/processlogindata", (req, res) => {
       if (inputPassword == value.password) {
         currentUser = username;
         console.log(currentUser);
-        res.redirect("/new")
+        res.redirect("/new");
       }
     } else {
       res.redirect("/")
@@ -74,7 +108,6 @@ app.get('/cryptogify', (req, res) => {
   room_number = req.query["room"];
   shasum.update(room_number);
   room_number = shasum.digest("hex");
-  req.query["room"] = room_number;
   if (online[room_number.toString()] == null && online[room_number.toString()] == undefined) { 
     online[room_number.toString()] = []; 
   }
@@ -87,6 +120,9 @@ app.get("/join/:chat", (req, res) => {
 }); 
 
 app.get("/chat", (req, res) => {
+  if (currentUser == "Anonymous") {
+    res.redirect("/");
+  }
   res.sendFile(__dirname + '/index.html');
 })
 
