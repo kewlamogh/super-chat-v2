@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Urbanist&display=swap');
+      body {
+        text-align: center;
+      }
+      div {
+        list-style-type: none;
+      }
+      * {
+        font-family: 'Urbanist', sans-serif;
+      }
+      input, button {
+        position: sticky;
+        bottom: 0px;
+      }
+    </style>
+  </head>
+  <body onbeforeunload="socket.to(room).emit('new message', username+' left.')">
+    <button onclick = "generateJoinLink();">Generate Join Link</button>
+    <div id="messages">
+
+    </div>
+    <input id="input"/><button id = "df">Send</button>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+      var socket = io();
+      var username;
+      var messages = document.getElementById('messages');
+      var input = document.getElementById('input')
+      var button = document.getElementById('df');
+      let room = "";
+      let on;
+
+      socket.on("joined", currentUser => {
+        username = currentUser;
+        console.log(username);
+        console.log(currentUser);
+        socket.emit('new message', "<br>"+username+" joined.")
+        alert(currentUser+" joined "+room+".")
+      })
+
+      function send() {
+        if (input.value) {
+          socket.emit('new message', "<br>"+username +": "+ input.value);
+          input.value = '';
+        }
+      }
+
+      socket.on("give online peeps", online => {
+        on = online;
+        console.log(on);
+      })
+
+      df.addEventListener('click', function(e) {
+        send();
+      });
+
+      input.addEventListener('keydown', function (e) {
+        if (e.keyCode == 13) {
+          send();
+        }
+      });
+      
+      socket.emit('new perzon', username);
+      socket.on('new message', function(msg) {
+        var item = document.createElement('span');
+        item.innerHTML = msg;
+        messages.appendChild(item);
+        window.scrollTo(0,document.body.scrollHeight);
+      });
+
+      socket.on('room', function (roomname, roomNum, targetUsername) {
+        room = roomNum;
+        console.log(room);
+      });
+
+      function generateJoinLink() {
+        alert("https://super-chat-v2.amoghthecool.repl.co/join/"+room);
+      }
+
+      document.body.onbeforeunload = function () {
+        socket.emit('new message', "<br>"+username+' left.')
+        socket.emit('person-left', username, room);
+      }
+    </script>
+  </body>
+</html>
